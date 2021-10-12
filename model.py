@@ -18,7 +18,7 @@ You can use the following models officially provided by torchvision：
 
 class Model(nn.Module):
 
-    def __init__(self, model_name, pretrained, hidden_size=128):
+    def __init__(self, model_name, pretrained=False, hidden_size=128):
         super().__init__()
 
         model_func = getattr(torchvision.models, model_name)
