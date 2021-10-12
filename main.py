@@ -1,4 +1,6 @@
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
 import random
 
 import torch
@@ -35,10 +37,10 @@ def parse_arguments():
 
     parser.add_argument('--data_path', type=str, default='dataset', help='the path of dataset')
 
-    parser.add_argument('--train_batch_size', default=128, type=int, help='training batch size')
-    parser.add_argument('--test_batch_size', default=128, type=int, help='test_data batch size')
+    parser.add_argument('--train_batch_size', default=32, type=int, help='training batch size')
+    parser.add_argument('--test_batch_size', default=32, type=int, help='test_data batch size')
 
-    parser.add_argument('--epochs', default=3, type=int, help='number of epochs tp train for')
+    parser.add_argument('--epochs', default=50, type=int, help='number of epochs tp train for')
     parser.add_argument('--lr', default=1e-3, type=float, help='learning rate')
     parser.add_argument('--device', default="cuda" if torch.cuda.is_available() else "cpu", type=str, help='divice')
 
@@ -77,7 +79,7 @@ def train(model, train_dataset, test_dataset, args):
     train_data_loader = torch.utils.data.DataLoader(train_dataset, args.train_batch_size, shuffle=True)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    lr_scheduler = StepLR(optimizer, step_size=5, gamma=0.1)
+    lr_scheduler = StepLR(optimizer, step_size=100, gamma=0.1)
 
     train_maes, train_mses, train_r2s, test_maes, test_mses, test_r2s = [],[],[],[],[],[]
 
@@ -158,7 +160,9 @@ if __name__ == '__main__':
     image_test_path = os.path.join(args.data_path, 'test')
     label_test_path = os.path.join(args.data_path, 'test.csv')
 
-    image_transforms = transforms.Compose([transforms.ToTensor()])
+    image_transforms = transforms.Compose([
+        transforms.Resize((128, 128)),
+        transforms.ToTensor()])
 
     train_data = ImageCSVData(image_train_path, label_train_path, image_transforms)
     test_data = ImageCSVData(image_test_path, label_test_path, image_transforms)

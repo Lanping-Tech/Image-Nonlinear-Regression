@@ -23,9 +23,10 @@ class Model(nn.Module):
 
         model_func = getattr(torchvision.models, model_name)
         self.target_model = model_func(pretrained=pretrained, num_classes=hidden_size)
+        self.dropout = nn.Dropout(p=0.2)
         self.head = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
-        output = F.relu(self.target_model(x))
+        output = F.relu(self.dropout(self.target_model(x)))
         output = self.head(output)
         return output
