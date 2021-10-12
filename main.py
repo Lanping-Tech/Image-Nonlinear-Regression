@@ -72,7 +72,10 @@ def test(model, dataset, batch_size, device, test=False):
     mse = metrics.mean_squared_error(labels_all, predict_all)
     r2 = metrics.r2_score(labels_all, predict_all)
 
-    return labels_all, predict_all, mae, mse, r2 if test else mae, mse, r2
+    if test:
+        return labels_all, predict_all, mae, mse, r2
+    else:
+        return mae, mse, r2
 
 def train(model, train_dataset, test_dataset, args):
 
@@ -112,7 +115,6 @@ def train(model, train_dataset, test_dataset, args):
         test_mses.append(test_mse)
         test_r2s.append(test_r2)
         
-
         # model save
         torch.save(model.state_dict(), args.output_path+'/epoch_{0}_train_loss_{1:>0.5}_test_loss_{2:>0.5}.ckpt'.format(epoch,train_mse,test_mse))
 
@@ -138,8 +140,6 @@ def train(model, train_dataset, test_dataset, args):
     test_value_plot = {}
     test_value_plot['label'] = test_labels_all
     test_value_plot['predict'] = test_predict_all
-
-
 
     performance_display(mae_plot, 'MAE', args.output_path)
     performance_display(mse_plot, 'MSE', args.output_path)
